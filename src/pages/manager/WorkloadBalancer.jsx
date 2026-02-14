@@ -7,8 +7,27 @@ export default function WorkloadBalancer() {
 
     useEffect(() => {
         api('/manager/team-stability')
-            .then(data => setTeam(data.teamMetrics))
-            .catch(console.error)
+            .then(data => {
+                if (!data || !data.teamMetrics || data.teamMetrics.length === 0) {
+                    // Fallback Simulation
+                    setTeam([
+                        { id: 901, name: 'Alex Developer (Simulated)', burnout_phase: 3, neural_load_index: 85, adaptive_capacity_score: 40 },
+                        { id: 902, name: 'Sarah Designer (Simulated)', burnout_phase: 1, neural_load_index: 45, adaptive_capacity_score: 80 },
+                        { id: 903, name: 'Mike QA (Simulated)', burnout_phase: 2, neural_load_index: 65, adaptive_capacity_score: 60 },
+                        { id: 904, name: 'Emma Product (Simulated)', burnout_phase: 4, neural_load_index: 92, adaptive_capacity_score: 25 },
+                        { id: 905, name: 'James DevOps (Simulated)', burnout_phase: 1, neural_load_index: 30, adaptive_capacity_score: 90 }
+                    ]);
+                } else {
+                    setTeam(data.teamMetrics);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                setTeam([
+                    { id: 901, name: 'Alex Developer (Simulated)', burnout_phase: 3, neural_load_index: 85, adaptive_capacity_score: 40 },
+                    { id: 902, name: 'Sarah Designer (Simulated)', burnout_phase: 1, neural_load_index: 45, adaptive_capacity_score: 80 }
+                ]);
+            })
             .finally(() => setLoading(false));
     }, []);
 

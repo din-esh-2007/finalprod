@@ -10,7 +10,26 @@ export default function AssignWork() {
     const [impact, setImpact] = useState(null);
 
     useEffect(() => {
-        api('/manager/employees').then(setEmployees).catch(console.error);
+        api('/manager/employees')
+            .then(data => {
+                if (!data || data.length === 0) {
+                    setEmployees([
+                        { id: 991, name: 'Alex Developer (Simulated)', username: 'alex_dev', position: 'Senior Dev' },
+                        { id: 992, name: 'Sarah Designer (Simulated)', username: 'sarah_des', position: 'UI/UX Lead' },
+                        { id: 993, name: 'Mike Tester (Simulated)', username: 'mike_qa', position: 'QA Engineer' }
+                    ]);
+                } else {
+                    setEmployees(data);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                // Fallback on error too
+                setEmployees([
+                    { id: 991, name: 'Alex Developer (Simulated)', username: 'alex_dev', position: 'Senior Dev' },
+                    { id: 992, name: 'Sarah Designer (Simulated)', username: 'sarah_des', position: 'UI/UX Lead' }
+                ]);
+            });
     }, []);
 
     useEffect(() => {
