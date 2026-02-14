@@ -205,27 +205,12 @@ async function getDb() {
     )
   `);
 
-  // ── AUTO-SEED DEFAULT USERS IF EMPTY ─────────────────────
-  const userCount = db.exec("SELECT COUNT(*) as count FROM users")[0].values[0][0];
-  if (userCount === 0) {
-    console.log('🌱 Seeding default users for production...');
-    const bcrypt = require('bcryptjs');
-    const hashed = bcrypt.hashSync('admin123', 10);
-    const hashedEmp = bcrypt.hashSync('password123', 10);
-
-    // 1. Admin
-    db.run("INSERT INTO users (name, username, email, password, role, position, status) VALUES ('System Admin', 'admin', 'admin@burnoutguardian.com', ?, 'ADMIN', 'Director of People', 'active')", [hashed]);
-
-    // 2. Manager
-    db.run("INSERT INTO users (name, username, email, password, role, position, status) VALUES ('Sarah Manager', 'manager1', 'sarah@burnoutguardian.com', ?, 'MANAGER', 'Engineering Lead', 'active')", [hashedEmp]);
-
-    // Get Manager ID
-    const mgrId = db.exec("SELECT id FROM users WHERE username = 'manager1'")[0].values[0][0];
-
-    // 3. Employee
-    db.run("INSERT INTO users (name, username, email, password, role, position, status, manager_id) VALUES ('Alex Developer', 'employee1', 'alex@burnoutguardian.com', ?, 'EMPLOYEE', 'Senior Dev', 'active', ?)", [hashedEmp, mgrId]);
-
-    console.log('✅ Default users created: admin/admin123, manager1/password123, employee1/password123');
+  // ── AUTO-SEED FOR PRODUCTION (USERS + METRICS) ───────────
+  try {
+    const seedProductionData = require('./production_seed');
+    seedProductionData(db);
+  } catch (err) {
+    console.error('❌ Production Seeding Error:', err);
   }
 
   saveDb();
