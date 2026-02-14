@@ -13,12 +13,12 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-const corsOptions = {
-    origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+// Allow all origins for now to fix 'Failed to fetch' issues
+app.use(cors({
+    origin: '*',
     credentials: true,
     optionsSuccessStatus: 200
-};
-app.use(cors(corsOptions));
+}));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
